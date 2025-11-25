@@ -4,6 +4,7 @@ require_once '../includes/auth.php';
 $auth = new Auth();
 $message = "";
 $success = false;
+$resetToken = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'] ?? '';
@@ -15,7 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if ($result['success']) {
             $success = true;
-            $message = "If an account with that email exists, we've sent you a password reset link. For demo purposes, your reset token is: " . $result['token'];
+            $resetToken = $result['token'];
+            $resetLink = "reset_password.php?token=" . $resetToken;
+            $message = "If an account with that email exists, we've sent you a password reset link. For demo purposes, click the button below or use this link: " . $resetLink;
         } else {
             $message = $result['message'];
         }
@@ -150,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </form>
             <?php else: ?>
               <div class="text-center">
-                <a href="reset_password.php" class="btn btn-primary">
+                <a href="reset_password.php?token=<?php echo htmlspecialchars($resetToken); ?>" class="btn btn-primary">
                   <i class="fas fa-key me-2"></i>Reset Password Now
                 </a>
               </div>

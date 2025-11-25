@@ -321,9 +321,21 @@ class Auth {
             
             // Update password based on user type
             $table = $resetData['user_type'];
-            $idField = $table . '_id';
             
-            $stmt = $this->db->prepare("UPDATE {$table} SET password = ?, updated_at = NOW() WHERE email = ?");
+            // Check if updated_at column exists
+            $hasUpdatedAt = false;
+            $columnsResult = $this->db->query("SHOW COLUMNS FROM {$table} LIKE 'updated_at'");
+            if ($columnsResult && $columnsResult->num_rows > 0) {
+                $hasUpdatedAt = true;
+            }
+            
+            // Build update query based on column availability
+            if ($hasUpdatedAt) {
+                $stmt = $this->db->prepare("UPDATE {$table} SET password = ?, updated_at = NOW() WHERE email = ?");
+            } else {
+                $stmt = $this->db->prepare("UPDATE {$table} SET password = ? WHERE email = ?");
+            }
+            
             $stmt->bind_param("ss", $hashedPassword, $resetData['email']);
             
             if ($stmt->execute()) {

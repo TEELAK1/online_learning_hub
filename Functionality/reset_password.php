@@ -5,6 +5,15 @@ $auth = new Auth();
 $message = "";
 $success = false;
 
+// Get token from URL
+$token = $_GET['token'] ?? '';
+
+// If no token provided and not a POST request, redirect to forgot password
+if (empty($token) && $_SERVER["REQUEST_METHOD"] != "POST") {
+    header("Location: forgot_password.php");
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $token = $_POST['token'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -27,8 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-
-$token = $_GET['token'] ?? '';
 ?>
 
 <!DOCTYPE html>
